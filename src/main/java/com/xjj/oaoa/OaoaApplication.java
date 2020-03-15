@@ -12,6 +12,9 @@ public class OaoaApplication {
         SpringApplication.run(OaoaApplication.class, args);
     }
 
+    public void TestMethod() {
+        System.out.println("TestMethod");
+    }
 
 
 }

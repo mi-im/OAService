@@ -33,30 +33,32 @@ public class LoginController {
     private DepartmentMapper departmentMapper;
 
     @GetMapping(value = "self")
-    public String T(HttpSession session, Map<String, Object> map){
+    public String T(HttpSession session, Map<String, Object> map) {
         Employee employee = (Employee) session.getAttribute("employee");
         System.out.println(employee);
         Department department = departmentMapper.selectById(employee.getDepartmentSn());
         map.put("employee1", employee);
         map.put("department", department);
-        map.put("img",Util.take(employee));
+        map.put("img", Util.take(employee));
         return "pages/self";
     }
+
     @GetMapping(value = "oa")
-    public String oa(){
+    public String oa() {
         return "redirect:self";
     }
+
     @GetMapping(value = "login")
-    public String login(){
+    public String login() {
         return "pages/login";
     }
 
     @PostMapping(value = "tologin")
-    public ModelAndView toLogin(@RequestParam("sn") String sn, @RequestParam("password") String password, HttpSession session){
+    public ModelAndView toLogin(@RequestParam("sn") String sn, @RequestParam("password") String password, HttpSession session) {
         Employee employee = employeeMapper.selectById(sn);
         Department department = departmentMapper.selectById(employee.getDepartmentSn());
-        ModelAndView model ;
-        if (employee.getPassword().equals(password)){
+        ModelAndView model;
+        if (employee.getPassword().equals(password)) {
             String img = Util.take(employee);
             model = new ModelAndView("pages/self");
             model.addObject("img", img);
@@ -70,12 +72,13 @@ public class LoginController {
     }
 
     @GetMapping(value = "quit")
-    public String quit(HttpSession session){
+    public String quit(HttpSession session) {
         session.setAttribute("employee", null);
         return "redirect:login";
     }
+
     @GetMapping(value = "to_change_password")
-    public String to_change(Map<String,Object> map,HttpSession session){
+    public String to_change(Map<String, Object> map, HttpSession session) {
         Employee employee = (Employee) session.getAttribute("employee");
         map.put("employee1", employee);
         map.put("img", Util.take(employee));
@@ -83,10 +86,10 @@ public class LoginController {
     }
 
     @PostMapping(value = "change_password")
-    public String change(@RequestParam("new1") String new1, @RequestParam("old") String old, @RequestParam("new2") String new2, HttpSession session){
+    public String change(@RequestParam("new1") String new1, @RequestParam("old") String old, @RequestParam("new2") String new2, HttpSession session) {
         Employee employee = (Employee) session.getAttribute("employee");
-        if (employee.getPassword().equals(old)){
-            if (new1.equals(new2)){
+        if (employee.getPassword().equals(old)) {
+            if (new1.equals(new2)) {
                 employee.setPassword(new1);
                 employeeMapper.updateById(employee);
                 return "redirect:self";

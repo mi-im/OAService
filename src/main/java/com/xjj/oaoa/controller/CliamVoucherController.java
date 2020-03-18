@@ -31,7 +31,7 @@ public class CliamVoucherController {
     private DealRecordMapper dealRecordMapper;
 
     @GetMapping(value = "claim_voucher_deal")
-    public String deal(Map<String, Object> map, HttpSession session){
+    public String deal(Map<String, Object> map, HttpSession session) {
         Employee employee = (Employee) session.getAttribute("employee");
         QueryWrapper<ClaimVoucher> queryWrapper = new QueryWrapper();
         queryWrapper.select().eq("next_deal_sn", employee.getSn());
@@ -44,8 +44,9 @@ public class CliamVoucherController {
         map.put("Contact", new Contact());
         return "pages/claim_voucher_deal";
     }
+
     @GetMapping(value = "claim_voucher_submit")
-    public String submit(@RequestParam("id") Integer id, HttpSession session, Map<String, Object> map){
+    public String submit(@RequestParam("id") Integer id, HttpSession session, Map<String, Object> map) {
 
 
         ClaimVoucher claimVoucher = claimVoucherMapper.selectById(id);
@@ -53,12 +54,12 @@ public class CliamVoucherController {
         Employee employee = employeeMapper.selectById(claimVoucher.getCreateSn());
         claimVoucher.setStatus(Contact.CLAIMVOUCHER_SUBMIT);
         //找到该员工的部门经理，并设置为下一个处理人,如果是总经理则，本人即为下一个处理人
-        if (employee.getPost().equals(Contact.POST_STAFF)||employee.getPost().equals(Contact.POST_FM)){
-        QueryWrapper<Employee> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select().eq("department_sn", employee.getDepartmentSn()).eq("post",Contact.POST_FM);
-        Employee employee1 = employeeMapper.selectOne(queryWrapper);
-        claimVoucher.setNextDealSn(employee1.getSn());
-        }else {
+        if (employee.getPost().equals(Contact.POST_STAFF) || employee.getPost().equals(Contact.POST_FM)) {
+            QueryWrapper<Employee> queryWrapper = new QueryWrapper<>();
+            queryWrapper.select().eq("department_sn", employee.getDepartmentSn()).eq("post", Contact.POST_FM);
+            Employee employee1 = employeeMapper.selectOne(queryWrapper);
+            claimVoucher.setNextDealSn(employee1.getSn());
+        } else {
             claimVoucher.setNextDealSn(employee.getSn());
         }
         claimVoucher.setStatus(Contact.CLAIMVOUCHER_SUBMIT);
@@ -75,11 +76,12 @@ public class CliamVoucherController {
         dealRecordMapper.insert(dealRecord);
         Employee employee1 = (Employee) session.getAttribute("employee");
         map.put("employee1", employee1);
-        map.put("img",Util.take(employee1));
+        map.put("img", Util.take(employee1));
         return "pages/claim_voucher_deal";
     }
+
     @GetMapping(value = "claim_voucher_to_check")
-    public String to_check(@RequestParam("id") Integer id, Map<String, Object> map, HttpSession session){
+    public String to_check(@RequestParam("id") Integer id, Map<String, Object> map, HttpSession session) {
 
         //获取报销单claimVoucher
         ClaimVoucher claimVoucher = claimVoucherMapper.selectById(id);
@@ -105,11 +107,12 @@ public class CliamVoucherController {
         map.put("employees", employees);
         map.put("record", new DealRecord());
         map.put("Contact", new Contact());
-        map.put("img",Util.take((Employee) session.getAttribute("employee")));
+        map.put("img", Util.take((Employee) session.getAttribute("employee")));
         return "pages/claim_voucher_check";
     }
+
     @GetMapping(value = "claim_voucher_check")
-    public String check(@ModelAttribute("record") DealRecord dealRecord, HttpSession session){
+    public String check(@ModelAttribute("record") DealRecord dealRecord, HttpSession session) {
         //获取处理人的信息
         Employee deal_employee = (Employee) session.getAttribute("employee");
         //处理记录已经有的信息为报销单id 备注 处理方式
@@ -120,25 +123,25 @@ public class CliamVoucherController {
         //通过处理方式来决定报销单的状态(4种：通过，打回，拒绝，打款)
         ClaimVoucher claimVoucher = claimVoucherMapper.selectById(dealRecord.getClaimVoucherId());
 
-        if (dealRecord.getDealWay().equals(Contact.DEAL_PASS)){
-            if (claimVoucher.getTotalAmount()<=Contact.LIMIT_CHECK|| deal_employee.getPost().equals(Contact.POST_GM)){
+        if (dealRecord.getDealWay().equals(Contact.DEAL_PASS)) {
+            if (claimVoucher.getTotalAmount() <= Contact.LIMIT_CHECK || deal_employee.getPost().equals(Contact.POST_GM)) {
                 claimVoucher.setStatus(Contact.CLAIMVOUCHER_APPROVED);
                 QueryWrapper<Employee> wrapper = new QueryWrapper<>();
-                wrapper.select().eq("post",Contact.POST_CASHIER);
+                wrapper.select().eq("post", Contact.POST_CASHIER);
                 claimVoucher.setNextDealSn(employeeMapper.selectOne(wrapper).getSn());
-            }else {
+            } else {
                 //报销太多要总经理复审
                 claimVoucher.setStatus(Contact.CLAIMVOUCHER_RECHECK);
                 QueryWrapper<Employee> employeeQueryWrapper = new QueryWrapper<>();
-                employeeQueryWrapper.select().eq("post",Contact.POST_GM);
+                employeeQueryWrapper.select().eq("post", Contact.POST_GM);
                 claimVoucher.setNextDealSn(employeeMapper.selectOne(employeeQueryWrapper).getSn());
             }
-        }else if(dealRecord.getDealWay().equals(Contact.DEAL_BACK)){
+        } else if (dealRecord.getDealWay().equals(Contact.DEAL_BACK)) {
             claimVoucher.setStatus(Contact.CLAIMVOUCHER_BACK);
             claimVoucher.setNextDealSn(claimVoucher.getCreateSn());
-        }else if(dealRecord.getDealWay().equals(Contact.DEAL_REJECT)){
+        } else if (dealRecord.getDealWay().equals(Contact.DEAL_REJECT)) {
             claimVoucher.setStatus(Contact.CLAIMVOUCHER_TERMINATED);
-        }else if (dealRecord.getDealWay().equals(Contact.DEAL_PAID)){
+        } else if (dealRecord.getDealWay().equals(Contact.DEAL_PAID)) {
             QueryWrapper<Employee> queryWrapper = new QueryWrapper<>();
             queryWrapper.select().eq("post", Contact.POST_CASHIER);
             claimVoucher.setStatus(Contact.CLAIMVOUCHER_PAID);
@@ -149,28 +152,30 @@ public class CliamVoucherController {
         claimVoucherMapper.updateById(claimVoucher);
         return "redirect:claim_voucher_deal";
     }
+
     @GetMapping(value = "claim_voucher_self")
-    public String self(HttpSession session, Map<String,Object> map){
+    public String self(HttpSession session, Map<String, Object> map) {
         //查询报销单
         Employee employee = (Employee) session.getAttribute("employee");
         QueryWrapper<ClaimVoucher> queryWrapperCliamVoucher = new QueryWrapper<>();
-        queryWrapperCliamVoucher.select().eq("create_sn",employee.getSn());
+        queryWrapperCliamVoucher.select().eq("create_sn", employee.getSn());
         List<ClaimVoucher> claimVoucher = claimVoucherMapper.selectList(queryWrapperCliamVoucher);
         System.out.println(claimVoucher);
         //查询报销目录
         QueryWrapper<ClaimVoucherItem> queryWrapper = new QueryWrapper();
-        queryWrapper.select().eq("claim_voucher_id",employee.getSn());
+        queryWrapper.select().eq("claim_voucher_id", employee.getSn());
         List<ClaimVoucherItem> list = claimVoucherItemMapper.selectList(queryWrapper);
         //查找人
 
-        map.put("em",employeeMapper.selectList(null));
-        map.put("clist",claimVoucher);
+        map.put("em", employeeMapper.selectList(null));
+        map.put("clist", claimVoucher);
         map.put("employee1", employee);
         map.put("img", Util.take(employee));
         return "pages/claim_voucher_self";
     }
+
     @GetMapping(value = "claim_voucher_detail")
-    public String detail(@RequestParam("id") Integer id, Map<String, Object> map, HttpSession session){
+    public String detail(@RequestParam("id") Integer id, Map<String, Object> map, HttpSession session) {
 
         ClaimVoucher claimVoucher = claimVoucherMapper.selectById(id);
 
@@ -189,22 +194,24 @@ public class CliamVoucherController {
         map.put("clist", list);
         map.put("records", rlist);
         map.put("employees", employees);
-        map.put("img",Util.take(employee));
+        map.put("img", Util.take(employee));
         return "pages/claim_voucher_detail";
     }
+
     @GetMapping(value = "claim_voucher_to_add")
-    public String to_add(Map<String, Object> map, HttpSession session){
+    public String to_add(Map<String, Object> map, HttpSession session) {
         Employee employee = (Employee) session.getAttribute("employee");
         map.put("employee1", employee);
         ClaimVoucherInfo claimVoucherInfo = new ClaimVoucherInfo();
         map.put("it", Contact.getItems());
         map.put("info", claimVoucherInfo);
-        map.put("img",Util.take(employee));
+        map.put("img", Util.take(employee));
         return "pages/claim_voucher_add";
     }
+
     @PostMapping(value = "claim_voucher_add")
-    public String add(@ModelAttribute("info") ClaimVoucherInfo claimVoucherInfo, HttpSession session){
-        System.out.println("表单提交的："+claimVoucherInfo.getClaimVoucher());
+    public String add(@ModelAttribute("info") ClaimVoucherInfo claimVoucherInfo, HttpSession session) {
+        System.out.println("表单提交的：" + claimVoucherInfo.getClaimVoucher());
         ClaimVoucher claimVoucher = new ClaimVoucher();
         Employee employee = (Employee) session.getAttribute("employee");
         claimVoucher.setCreateSn(employee.getSn());
@@ -214,9 +221,8 @@ public class CliamVoucherController {
         claimVoucher.setStatus(Contact.CLAIMVOUCHER_CREATED);
         claimVoucher.setTotalAmount(claimVoucherInfo.getClaimVoucher().getTotalAmount());
         claimVoucherInfo.setClaimVoucher(claimVoucher);
-       claimVoucherMapper.insert(claimVoucher);
-        for (int i=0;i< claimVoucherInfo.getItems().size();i++)
-        {
+        claimVoucherMapper.insert(claimVoucher);
+        for (int i = 0; i < claimVoucherInfo.getItems().size(); i++) {
             claimVoucherInfo.getItems().get(i).setClaimVoucherId(claimVoucherInfo.getClaimVoucher().getId());
             claimVoucherItemMapper.insert(claimVoucherInfo.getItems().get(i));
         }
@@ -228,7 +234,7 @@ public class CliamVoucherController {
     }
 
     @GetMapping(value = "claim_voucher_to_update")
-    public String to_update(Map<String, Object> map, @RequestParam("id") Integer id, HttpSession session){
+    public String to_update(Map<String, Object> map, @RequestParam("id") Integer id, HttpSession session) {
         Employee employee = (Employee) session.getAttribute("employee");
 
         ClaimVoucher claimVoucher = claimVoucherMapper.selectById(id);
@@ -242,13 +248,13 @@ public class CliamVoucherController {
         map.put("img", Util.take(employee));
         map.put("info", info);
         map.put("it", Contact.getItems());
-        System.out.println("修改前的info:"+info);
+        System.out.println("修改前的info:" + info);
         return "pages/claim_voucher_update";
     }
 
     @PostMapping(value = "claim_voucher_update")
-    public String update(@ModelAttribute("info") ClaimVoucherInfo info, HttpSession session){
-        System.out.println("进入数据库前的info:"+info);
+    public String update(@ModelAttribute("info") ClaimVoucherInfo info, HttpSession session) {
+        System.out.println("进入数据库前的info:" + info);
         Employee employee = (Employee) session.getAttribute("employee");
 /*        info
         claimVoucherMapper.updateById()*/
@@ -270,10 +276,10 @@ public class CliamVoucherController {
         for (ClaimVoucherItem o : olds) {
             //不在标志
             boolean flag = false;
-            for (ClaimVoucherItem n : news){
+            for (ClaimVoucherItem n : news) {
                 if (n.getId() == o.getId())
                     flag = true;
-                    break;
+                break;
             }
             if (!flag)
                 claimVoucherItemMapper.deleteById(o.getId());
@@ -282,10 +288,10 @@ public class CliamVoucherController {
         for (ClaimVoucherItem c : info.getItems()) {
 
             c.setClaimVoucherId(claimVoucher.getId());
-            if (c.getId() != null){
+            if (c.getId() != null) {
                 claimVoucherItemMapper.updateById(c);
 
-            }else {
+            } else {
                 claimVoucherItemMapper.insert(c);
             }
 

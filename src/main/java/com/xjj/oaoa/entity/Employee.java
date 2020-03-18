@@ -21,7 +21,7 @@ public class Employee {
 
     private String img;
 
-    public String getImg(){
+    public String getImg() {
         if (this.getPost().equals(Contact.POST_GM)) {
             return Contact.GM;
         } else if (this.getPost().equals(Contact.POST_FM)) {

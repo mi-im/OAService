@@ -23,7 +23,7 @@ public class DepartController {
 
 
     @GetMapping(value = "department_list")
-    public String list(Model model, HttpSession session){
+    public String list(Model model, HttpSession session) {
         Employee employee = (Employee) session.getAttribute("employee");
         List<Department> list = departmentMapper.selectList(null);
         System.out.println(list);
@@ -34,13 +34,12 @@ public class DepartController {
     }
 
 
-
     @GetMapping(value = "department_to_add")
-    public String to_add(HttpSession session, Map<String, Object> map){
+    public String to_add(HttpSession session, Map<String, Object> map) {
         Employee employee = (Employee) session.getAttribute("employee");
         map.put("employee1", employee);
-        map.put("img",Util.take(employee));
-        if (employee.getPost().equals(Contact.POST_GM)){
+        map.put("img", Util.take(employee));
+        if (employee.getPost().equals(Contact.POST_GM)) {
 
             return "pages/department_add";
         }
@@ -48,8 +47,8 @@ public class DepartController {
     }
 
     @PostMapping(value = "department_add")
-    public String add(@RequestParam("sn") String sn, @RequestParam("name") String name, @RequestParam("address") String address){
-        Department department =new Department();
+    public String add(@RequestParam("sn") String sn, @RequestParam("name") String name, @RequestParam("address") String address) {
+        Department department = new Department();
         department.setSn(sn);
         department.setAddress(address);
         department.setName(name);
@@ -58,16 +57,16 @@ public class DepartController {
     }
 
     @GetMapping(value = "department_to_update")
-    public ModelAndView to_update(@RequestParam("sn") String sn,HttpSession session){
+    public ModelAndView to_update(@RequestParam("sn") String sn, HttpSession session) {
         Employee employee = (Employee) session.getAttribute("employee");
         if (employee.getPost().equals(Contact.POST_GM))
-        return new ModelAndView("pages/department_update").addObject("department",departmentMapper.selectById(sn)).addObject("employee1",employee).addObject("img",Util.take(employee));
-        return new ModelAndView("pages/403").addObject("employee1",employee).addObject("img",Util.take(employee));
+            return new ModelAndView("pages/department_update").addObject("department", departmentMapper.selectById(sn)).addObject("employee1", employee).addObject("img", Util.take(employee));
+        return new ModelAndView("pages/403").addObject("employee1", employee).addObject("img", Util.take(employee));
     }
 
     @PostMapping(value = "department_update")
-    public String update(@RequestParam("sn") String sn, @RequestParam("name") String name, @RequestParam("address") String address){
-        Department department= departmentMapper.selectById(sn);
+    public String update(@RequestParam("sn") String sn, @RequestParam("name") String name, @RequestParam("address") String address) {
+        Department department = departmentMapper.selectById(sn);
         department.setName(name);
         department.setAddress(address);
         departmentMapper.updateById(department);
@@ -76,15 +75,15 @@ public class DepartController {
     }
 
     @GetMapping(value = "department_remove")
-    public String remove(@RequestParam("sn") String sn, HttpSession session, Map<String, Object> map ){
+    public String remove(@RequestParam("sn") String sn, HttpSession session, Map<String, Object> map) {
         Employee employee = (Employee) session.getAttribute("employee");
 
-        if (employee.getPost().equals(Contact.POST_GM)){
+        if (employee.getPost().equals(Contact.POST_GM)) {
             departmentMapper.deleteById(sn);
             return "redirect:department_list";
-        }else {
+        } else {
             map.put("employee1", employee);
-            map.put("img",Util.take(employee));
+            map.put("img", Util.take(employee));
             return "pages/403";
         }
 

@@ -1,7 +1,6 @@
 package com.xjj.oaoa.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.xjj.oaoa.global.Contact;
 import lombok.Data;
 

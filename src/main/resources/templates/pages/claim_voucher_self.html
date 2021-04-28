@@ -13,7 +13,7 @@
                     <div class="panel  heading-border">
                         <div class="panel-menu">
                             <div class="row">
-                                <div class="hidden-xs hidden-sm col-md-3">
+                                <!--<div class="hidden-xs hidden-sm col-md-3">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default light">
                                             <i class="fa fa-refresh"></i>
@@ -23,19 +23,19 @@
                                         </button>
                                         <button type="button" class="btn btn-default light">
                                             <i class="fa fa-plus"
-                                               onclick="javascript:window.location.href='/claim_voucher/to_add';"></i>
+                                               th:onclick="addClaim()"></i>
                                         </button>
                                     </div>
-                                </div>
+                                </div>-->
                                 <div class="col-xs-12 col-md-9 text-right">
-                                    <div class="btn-group">
+                                   <!-- <div class="btn-group">
                                         <button type="button" class="btn btn-default light">
                                             <i class="fa fa-chevron-left"></i>
                                         </button>
                                         <button type="button" class="btn btn-default light">
                                             <i class="fa fa-chevron-right"></i>
                                         </button>
-                                    </div>
+                                    </div>-->
                                 </div>
                             </div>
                         </div>
@@ -79,4 +79,16 @@
     </section>
 </div>
 <div th:replace="pages/bottom :: bottom"></div>
+<script type="text/javascript">
+    function addClaim() {
+        $.getJSON({
+            type: 'get',
+            url: '@{claim_voucher_to_add}',
+            success: function (r) {
+                console(r);
+            }
+        })
+
+    }
+</script>
 </html>
